@@ -21,6 +21,7 @@ namespace AttackSQL
         {
             InitializeComponent();
         }
+        Setdatatextsql setdatatextsql = new Setdatatextsql();
         private  bool khoitao() {
 
             string batFilePath =  Application.StartupPath + @"\installsql.bat";
@@ -53,6 +54,10 @@ namespace AttackSQL
             if (!Directory.Exists(Application.StartupPath + "\\Script "))
             {
                 Directory.CreateDirectory(Application.StartupPath+ "\\Script");
+            }
+            if (!Directory.Exists(Application.StartupPath + "\\Database "))
+            {
+                Directory.CreateDirectory(Application.StartupPath + "\\Database");
             }
             if (!File.Exists(Application.StartupPath + "\\Script\\Data2.sql"))
             {
@@ -96,7 +101,6 @@ namespace AttackSQL
             {
                 SqlConnection con = new SqlConnection();
                 con.ConnectionString = @"Data Source=(localdb)\TSSoft;Integrated Security=True";
-                
                 con.Open();
                 return true;
             }
@@ -105,12 +109,12 @@ namespace AttackSQL
                 return false;
             }
         }
-        private bool checkconnectsql()
+        private bool checkconnectsql(string DB)
         {
             try
             {
                 SqlConnection con = new SqlConnection();
-                con.ConnectionString = @"Data Source=(Localdb)\TSSoft;Initial Catalog=QLCtyCK;Integrated Security=True";
+                con.ConnectionString = @"Data Source=(Localdb)\TSSoft;Initial Catalog="+ DB + ";Integrated Security=True";
                 con.Open();
                 return true;
             }
@@ -123,8 +127,13 @@ namespace AttackSQL
         {
             try
             {
-                string script = File.ReadAllText(pathStoreProceduresFile);
-                // split script on GO command
+                
+                setdatatextsql.SetupDB.Namedatabase = txtnamedatabase.Text;
+                setdatatextsql.SetupDB.FILENAME = Application.StartupPath + "\\Database\\" + setdatatextsql.SetupDB.Namedatabase + ".mdf";
+                setdatatextsql.SetupDB.FILENAME_log = Application.StartupPath + "\\Database\\" + setdatatextsql.SetupDB.Namedatabase + "_log.ldf";
+                string script1 = setdatatextsql.Querysql();
+                string script = script1 + File.ReadAllText(pathStoreProceduresFile);
+                //split script on GO command
                 System.Collections.Generic.IEnumerable<string> commandStrings = Regex.Split(script, @"^\s*GO\s*$",
                                          RegexOptions.Multiline | RegexOptions.IgnoreCase);
                 using (SqlConnection connection = new SqlConnection(connectionString))
@@ -166,7 +175,7 @@ namespace AttackSQL
 
         private void simpleButton6_Click(object sender, EventArgs e)
         {
-            if (checkconnectsql())
+            if (checkconnectsql(setdatatextsql.SetupDB.Namedatabase))
             {
                 this.Hide();
                 Form2 frm = new Form2();
@@ -234,7 +243,7 @@ namespace AttackSQL
                 {
                     Thread.Sleep(1000);
                     a = a + 1;
-                    if (checkconnectsql())
+                    if (checkconnectsql(setdatatextsql.SetupDB.Namedatabase))
                     {
                         rs = true;
                         break;
@@ -290,6 +299,11 @@ namespace AttackSQL
             };
             timer1.Enabled = true;
             timer1.Tick += new System.EventHandler(OnTimerEvent);
+           
+        }
+
+        private void simpleButton7_Click(object sender, EventArgs e)
+        {
             AsyncMethods();
         }
     }

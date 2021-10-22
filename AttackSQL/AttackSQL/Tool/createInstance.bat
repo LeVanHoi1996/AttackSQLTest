@@ -1,10 +1,11 @@
 @echo off
 :: BatchGotAdmin (Run as Admin code starts)
 SETLOCAL
-SET DBFILE11="C:\Program Files\Microsoft SQL Server\120\LocalDB\Binn"
-SET DBFILE13="C:\Program Files\Microsoft SQL Server\130\LocalDB\Binn"
+SET DBFILE11="C:\Program Files\Microsoft SQL Server\120\Tools\Binn\\bo"
+SET DBFILE13="C:\Program Files\Microsoft SQL Server\130\Tools\Binn\\bo"
+SET DBFILE14="C:\Program Files\Microsoft SQL Server\140\LocalDB\Binn"
 
-IF EXIST "%DBFILE11%" (GOTO 110) ELSE (GOTO 130)
+IF EXIST "%DBFILE11%" (GOTO 110) ELSE if EXIST "%DBFILE13%" (GOTO 130) ELSE (GOTO 140)
 
 
 :110
@@ -18,10 +19,13 @@ GOTO END
 echo %DBFILE13%
 cd %DBFILE13%
 GOTO END
-
+:140
+echo %DBFILE14%
+cd %DBFILE14%
+GOTO END
 :END
-pause
-start /wait SqlLocalDb create MSSQLLocalDB -s
+pause 
+::start /wait SqlLocalDb.exe create "MSSQLLocalDB" -s
 
 date/t 
 time /t
@@ -30,7 +34,6 @@ start /wait SqlLocalDb create TSSoft -s
 date/t 
 time /t
 @echo -----check version-----
-::start /wait SqlLocalDb i adaline
 
 
 PAUSE
